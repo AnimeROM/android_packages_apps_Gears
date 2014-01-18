@@ -40,6 +40,10 @@ public class BarsSettings extends SettingsPreferenceFragment implements
         Preference.OnPreferenceChangeListener {
     private static final String TAG = "BarsSettings";
 
+    // ListView Animations Key
+    private static final String KEY_LISTVIEW_ANIMATION = "listview_animation";
+    private static final String KEY_LISTVIEW_INTERPOLATOR = "listview_interpolator";
+
     private static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
     private static final String STATUS_BAR_NOTIF_COUNT = "status_bar_notif_count";
     private static final String STATUS_BAR_TRAFFIC = "status_bar_traffic";
@@ -54,6 +58,10 @@ public class BarsSettings extends SettingsPreferenceFragment implements
     private CheckBoxPreference mStatusBarNetworkActivity;
     private CheckBoxPreference mQuickSettingsDynamic;
     private ListPreference mQuickPulldown;
+
+    // ListView Animations Preference
+    private ListPreference mListViewAnimation;
+    private ListPreference mListViewInterpolator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,6 +114,22 @@ public class BarsSettings extends SettingsPreferenceFragment implements
             Settings.System.QUICK_SETTINGS_TILES_ROW, 1) != 0);
         mQuickSettingsDynamic.setOnPreferenceChangeListener(this);
 
+        // ListView Animations
+        mListViewAnimation = (ListPreference) findPreference(KEY_LISTVIEW_ANIMATION);
+        int listviewanimation = Settings.System.getInt(getContentResolver(),
+                Settings.System.LISTVIEW_ANIMATION, 1);
+        mListViewAnimation.setValue(String.valueOf(listviewanimation));
+        mListViewAnimation.setSummary(mListViewAnimation.getEntry());
+        mListViewAnimation.setOnPreferenceChangeListener(this);
+
+        mListViewInterpolator = (ListPreference) findPreference(KEY_LISTVIEW_INTERPOLATOR);
+        int listviewinterpolator = Settings.System.getInt(getContentResolver(),
+                Settings.System.LISTVIEW_INTERPOLATOR, 0);
+        mListViewInterpolator.setValue(String.valueOf(listviewinterpolator));
+        mListViewInterpolator.setSummary(mListViewInterpolator.getEntry());
+        mListViewInterpolator.setOnPreferenceChangeListener(this);
+
+
         boolean hasNavBar = getResources().getBoolean(
                 com.android.internal.R.bool.config_showNavigationBar);
         // Also check, if users without navigation bar force enabled it.
@@ -151,11 +175,27 @@ public class BarsSettings extends SettingsPreferenceFragment implements
                 Settings.System.QUICK_SETTINGS_TILES_ROW, value ? 1 : 0);
         } else if (preference == mQuickPulldown) {
             int statusQuickPulldown = Integer.valueOf((String) objValue);
-            Settings.System.putInt(resolver, Settings.System.QS_QUICK_PULLDOWN,
-                    statusQuickPulldown);
+           Settings.System.putInt(resolver, Settings.System.QS_QUICK_PULLDOWN,
+                   statusQuickPulldown);
+        } else if (preference == mListViewAnimation) {
+            int listviewanimation = Integer.valueOf((String) objValue);
+            int index = mListViewAnimation.findIndexOfValue((String) objValue);
+            Settings.System.putInt(resolver, Settings.System.LISTVIEW_ANIMATION,
+                    listviewanimation);
+            mListViewAnimation.setSummary(mListViewAnimation.getEntries()[index]);
+            return true;
+        } else if (preference == mListViewInterpolator) {
+            int listviewinterpolator = Integer.valueOf((String) objValue);
+            int index = mListViewInterpolator.findIndexOfValue((String) objValue);
+            Settings.System.putInt(resolver, Settings.System.LISTVIEW_INTERPOLATOR,
+                    listviewinterpolator);
+            mListViewInterpolator.setSummary(mListViewInterpolator.getEntries()[index]);
+
+            return true; 
         } else {
             return false;
         }
+
         return true;
     }
 
