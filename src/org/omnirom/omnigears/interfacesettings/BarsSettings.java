@@ -69,8 +69,6 @@ public class BarsSettings extends SettingsPreferenceFragment implements
     private CheckBoxPreference mQuickSettingsDynamic;
     private ListPreference mQuickPulldown;
 
-    private CheckBoxPreference mSoftBackKillApp;
-
     // ListView Animations Preference
     private ListPreference mListViewAnimation;
     private ListPreference mListViewInterpolator;
