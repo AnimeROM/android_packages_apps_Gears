@@ -33,7 +33,10 @@ import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.DisplayInfo;
+import android.view.WindowManager;
 import android.view.WindowManagerGlobal;
 
 public class BarsSettings extends SettingsPreferenceFragment implements
@@ -49,9 +52,15 @@ public class BarsSettings extends SettingsPreferenceFragment implements
     private static final String STATUS_BAR_TRAFFIC = "status_bar_traffic";
     private static final String STATUS_BAR_NETWORK_ACTIVITY = "status_bar_network_activity";
     private static final String QUICK_PULLDOWN = "quick_pulldown";
+    private static final String SMART_PULLDOWN = "smart_pulldown";
     private static final String QUICKSETTINGS_DYNAMIC = "quicksettings_dynamic_row";
     private static final String CATEGORY_NAVBAR = "category_navigation_bar";
     private static final String SOFT_BACK_KILL_APP = "soft_back_kill_app";
+
+    // Device types
+    private static final int DEVICE_PHONE  = 0;
+    private static final int DEVICE_HYBRID = 1;
+    private static final int DEVICE_TABLET = 2;
 
     private CheckBoxPreference mStatusBarBrightnessControl;
     private CheckBoxPreference mStatusBarNotifCount;
@@ -59,11 +68,16 @@ public class BarsSettings extends SettingsPreferenceFragment implements
     private CheckBoxPreference mStatusBarNetworkActivity;
     private CheckBoxPreference mQuickSettingsDynamic;
     private ListPreference mQuickPulldown;
+
     private CheckBoxPreference mSoftBackKillApp;
 
     // ListView Animations Preference
     private ListPreference mListViewAnimation;
     private ListPreference mListViewInterpolator;
+
+    private ListPreference mSmartPulldown;
+    private CheckBoxPreference mSoftBackKillApp;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,10 +120,24 @@ public class BarsSettings extends SettingsPreferenceFragment implements
         mStatusBarNetworkActivity.setOnPreferenceChangeListener(this);
 
         mQuickPulldown = (ListPreference) findPreference(QUICK_PULLDOWN);
-        mQuickPulldown.setOnPreferenceChangeListener(this);
-        int statusQuickPulldown =
-                Settings.System.getInt(resolver, Settings.System.QS_QUICK_PULLDOWN,0);
-        mQuickPulldown.setValue(String.valueOf(statusQuickPulldown));
+        mSmartPulldown = (ListPreference) findPreference(SMART_PULLDOWN);
+
+        if (isPhone(getActivity())) {
+            int quickPulldown = Settings.System.getInt(resolver,
+                    Settings.System.QS_QUICK_PULLDOWN, 0);
+            mQuickPulldown.setValue(String.valueOf(quickPulldown));
+            updateQuickPulldownSummary(quickPulldown);
+            mQuickPulldown.setOnPreferenceChangeListener(this);
+
+            int smartPulldown = Settings.System.getInt(resolver,
+                    Settings.System.QS_SMART_PULLDOWN, 0);
+            mSmartPulldown.setValue(String.valueOf(smartPulldown));
+            updateSmartPulldownSummary(smartPulldown);
+            mSmartPulldown.setOnPreferenceChangeListener(this);
+        } else {
+            prefSet.removePreference(mQuickPulldown);
+            prefSet.removePreference(mSmartPulldown);
+        }
 
         mQuickSettingsDynamic = (CheckBoxPreference) prefSet.findPreference(QUICKSETTINGS_DYNAMIC);
         mQuickSettingsDynamic.setChecked(Settings.System.getInt(resolver,
@@ -184,10 +212,21 @@ public class BarsSettings extends SettingsPreferenceFragment implements
             int statusQuickPulldown = Integer.valueOf((String) objValue);
            Settings.System.putInt(resolver, Settings.System.QS_QUICK_PULLDOWN,
                    statusQuickPulldown);
+
+            int quickPulldown = Integer.valueOf((String) objValue);
+            Settings.System.putInt(resolver, Settings.System.QS_QUICK_PULLDOWN,
+                    quickPulldown);
+            updateQuickPulldownSummary(quickPulldown);
+        } else if (preference == mSmartPulldown) {
+            int smartPulldown = Integer.valueOf((String) objValue);
+            Settings.System.putInt(resolver, Settings.System.QS_SMART_PULLDOWN,
+                    smartPulldown);
+            updateSmartPulldownSummary(smartPulldown);
         } else if (preference == mSoftBackKillApp) {
             boolean value = (Boolean) objValue;
             Settings.System.putInt(resolver,
                 Settings.System.SOFT_BACK_KILL_APP_ENABLE, value ? 1 : 0);
+
         } else if (preference == mListViewAnimation) {
             int listviewanimation = Integer.valueOf((String) objValue);
             int index = mListViewAnimation.findIndexOfValue((String) objValue);
@@ -221,5 +260,47 @@ public class BarsSettings extends SettingsPreferenceFragment implements
             return 0;
         }
         return intState;
+    }
+
+    private void updateQuickPulldownSummary(int i) {
+        if (i == 0) {
+            mQuickPulldown.setSummary(R.string.quick_pulldown_off);
+        } else if (i == 1) {
+            mQuickPulldown.setSummary(R.string.quick_pulldown_right);
+        } else if (i == 2) {
+            mQuickPulldown.setSummary(R.string.quick_pulldown_left);
+        } else if (i == 3) {
+            mQuickPulldown.setSummary(R.string.quick_pulldown_centre);
+        }
+    }
+
+    private void updateSmartPulldownSummary(int i) {
+        if (i == 0) {
+            mSmartPulldown.setSummary(R.string.smart_pulldown_off);
+        } else if (i == 1) {
+            mSmartPulldown.setSummary(R.string.smart_pulldown_dismissable);
+        } else if (i == 2) {
+            mSmartPulldown.setSummary(R.string.smart_pulldown_persistent);
+        }
+    }
+
+    private static int getScreenType(Context con) {
+        WindowManager wm = (WindowManager) con.getSystemService(Context.WINDOW_SERVICE);
+        DisplayInfo outDisplayInfo = new DisplayInfo();
+        wm.getDefaultDisplay().getDisplayInfo(outDisplayInfo);
+        int shortSize = Math.min(outDisplayInfo.logicalHeight, outDisplayInfo.logicalWidth);
+        int shortSizeDp =
+            shortSize * DisplayMetrics.DENSITY_DEFAULT / outDisplayInfo.logicalDensityDpi;
+        if (shortSizeDp < 600) {
+            return DEVICE_PHONE;
+        } else if (shortSizeDp < 720) {
+            return DEVICE_HYBRID;
+        } else {
+            return DEVICE_TABLET;
+        }
+    }
+
+    public static boolean isPhone(Context con) {
+        return getScreenType(con) == DEVICE_PHONE;
     }
 }

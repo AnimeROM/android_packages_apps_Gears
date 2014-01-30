@@ -57,6 +57,14 @@
                 android:entryValues="@array/quick_pulldown_values"
                 android:persistent="false" />
 
+        <ListPreference
+                android:key="smart_pulldown"
+                android:title="@string/smart_pulldown_title"
+                android:summary="@string/smart_pulldown_summary"
+                android:entries="@array/smart_pulldown_entries"
+                android:entryValues="@array/smart_pulldown_values"
+                android:persistent="false" />
+
         <CheckBoxPreference
                 android:key="quicksettings_dynamic_row"
                 android:title="@string/qs_configurable_title"
@@ -71,9 +79,19 @@
             android:title="@string/bars_and_menus_category_navigation_bar_title">
 
         <PreferenceScreen
+            android:key="navigation_bar"
+            android:fragment="org.omnirom.omnigears.interfacesettings.NavBar"
+            android:title="@string/navigation_bar_title" />
+        <PreferenceScreen
             android:key="navigation_ring"
             android:fragment="org.omnirom.omnigears.interfacesettings.NavRing"
             android:title="@string/navigation_ring_title" />
+
+        <CheckBoxPreference
+            android:key="soft_back_kill_app"
+            android:title="@string/soft_back_kill_app_title"
+            android:summary="@string/soft_back_kill_app_summary"
+            android:persistent="false"/>
     </PreferenceCategory>
 
         <CheckBoxPreference
