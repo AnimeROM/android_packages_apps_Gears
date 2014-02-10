@@ -56,6 +56,7 @@ public class BarsSettings extends SettingsPreferenceFragment implements
     private static final String QUICKSETTINGS_DYNAMIC = "quicksettings_dynamic_row";
     private static final String CATEGORY_NAVBAR = "category_navigation_bar";
     private static final String SOFT_BACK_KILL_APP = "soft_back_kill_app";
+    private static final String EMULATE_MENU_KEY = "emulate_menu_key";
 
     // Device types
     private static final int DEVICE_PHONE  = 0;
@@ -75,6 +76,7 @@ public class BarsSettings extends SettingsPreferenceFragment implements
 
     private ListPreference mSmartPulldown;
     private CheckBoxPreference mSoftBackKillApp;
+    private CheckBoxPreference mEmulateMenuKey;
 
 
     @Override
@@ -171,6 +173,11 @@ public class BarsSettings extends SettingsPreferenceFragment implements
             mSoftBackKillApp.setChecked(Settings.System.getInt(resolver,
                     Settings.System.SOFT_BACK_KILL_APP_ENABLE, 0) == 1);
             mSoftBackKillApp.setOnPreferenceChangeListener(this);
+
+            mEmulateMenuKey = (CheckBoxPreference) prefSet.findPreference(EMULATE_MENU_KEY);
+            mEmulateMenuKey.setChecked(Settings.System.getInt(resolver,
+                    Settings.System.EMULATE_HW_MENU_KEY, 0) == 1);
+            mEmulateMenuKey.setOnPreferenceChangeListener(this);
         }
     }
 
@@ -240,6 +247,11 @@ public class BarsSettings extends SettingsPreferenceFragment implements
             mListViewInterpolator.setSummary(mListViewInterpolator.getEntries()[index]);
 
             return true; 
+
+        } else if (preference == mEmulateMenuKey) {
+            boolean value = (Boolean) objValue;
+            Settings.System.putInt(resolver,
+                Settings.System.EMULATE_HW_MENU_KEY, value ? 1 : 0);
         } else {
             return false;
         }
