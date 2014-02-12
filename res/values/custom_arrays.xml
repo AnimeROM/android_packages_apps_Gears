@@ -2,6 +2,7 @@
 <!--  Copyright (C) 2013 The OmniROM Project
 
   Parts Copyright (C) 2012-2013 The CyanogenMod Project
+  Parts Copyright (C) 2014 The XPerience Project
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -367,6 +368,7 @@
         <item>5</item>
         <item>6</item>
         <item>7</item>
+    </string-array>
 
     <!--- Clock -->
     <string-array name="clock_style_entries" translatable="false">
