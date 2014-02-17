@@ -131,6 +131,11 @@
             android:entryValues="@array/listview_interpolator_values"
             android:defaultValue="0" />
 
+        <PreferenceScreen
+            android:key="recents_ram_bar"
+            android:fragment="com.android.settings.xperience.RamBar"
+            android:title="@string/ram_bar" /> 
+
     </PreferenceCategory>
 
 </PreferenceScreen>
