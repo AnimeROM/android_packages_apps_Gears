@@ -367,6 +367,7 @@
         <item>5</item>
         <item>6</item>
         <item>7</item>
+    </string-array>
 
     <!--- Clock -->
     <string-array name="clock_style_entries" translatable="false">
