@@ -235,21 +235,15 @@ public class BarsSettings extends SettingsPreferenceFragment implements
             Settings.System.putInt(resolver,
                 Settings.System.QUICK_SETTINGS_TILES_ROW, value ? 1 : 0);
         } else if (preference == mQuickPulldown) {
-<<<<<<< HEAD
             int statusQuickPulldown = Integer.valueOf((String) objValue);
            Settings.System.putInt(resolver, Settings.System.QS_QUICK_PULLDOWN,
                    statusQuickPulldown);
 
-            int quickPulldown = Integer.valueOf((String) objValue);
-            Settings.System.putInt(resolver, Settings.System.QS_QUICK_PULLDOWN, quickPulldown);
-            updateQuickPulldownSummary(quickPulldown);
-=======
             int val = Integer.parseInt((String) objValue);
             int index = mQuickPulldown.findIndexOfValue((String) objValue);
             Settings.System.putInt(resolver,
                 Settings.System.QS_QUICK_PULLDOWN, val);
             mQuickPulldown.setSummary(mQuickPulldown.getEntries()[index]);
->>>>>>> 2e5a64d75c0c50f3674bbf8ba1a4d4ca39924ede
         } else if (preference == mSmartPulldown) {
             int val = Integer.parseInt((String) objValue);
             int index = mSmartPulldown.findIndexOfValue((String) objValue);
