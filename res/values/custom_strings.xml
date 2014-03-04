@@ -507,4 +507,5 @@
     <string name="clock_date_style_uppercase">Uppercase</string>
     <string name="ram_bar"> Ram Bar</string>
 
+    <string name="button_timeout_summary">Button timeout summary</string>
 </resources>  
